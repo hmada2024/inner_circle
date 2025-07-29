@@ -14,19 +14,19 @@ final authRepositoryProvider = Provider(
 // Provider لتوفير AuthController
 final authControllerProvider = Provider((ref) {
   final authRepository = ref.watch(authRepositoryProvider);
-  return AuthController(authRepository: authRepository, ref: ref);
+  // لاحظ هنا استخدمنا ref.watch بدلاً من تمرير الـ ref
+  return AuthController(authRepository: authRepository);
 });
 
 class AuthController {
   final AuthRepository _authRepository;
-  final ProviderRef _ref;
 
+  // قمنا بإزالة الـ ref من هنا
   AuthController({
     required AuthRepository authRepository,
-    required ProviderRef ref,
-  })  : _authRepository = authRepository,
-        _ref = ref;
+  }) : _authRepository = authRepository;
 
+  // سنقوم بتمرير الـ context مباشرة من الواجهة
   void signInWithPhone(BuildContext context, String phoneNumber) {
     _authRepository.signInWithPhone(context, phoneNumber);
   }
