@@ -1,0 +1,35 @@
+name: inner_circle
+description: "A new Flutter project."
+publish_to: "none"
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.4.3 <4.0.0"
+
+# --- قسم الاعتماديات الأساسية للتطبيق ---
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # Firebase Services
+  firebase_core: ^3.1.0 # يجب أن يكون إصدار متوافق
+  firebase_auth: ^5.1.0 # يجب أن يكون إصدار متوافق
+  cloud_firestore: ^5.0.1 # يجب أن يكون إصدار متوافق
+
+  # State Management
+  flutter_riverpod: ^2.5.1 # مكانه الصحيح هنا
+
+  # Icons
+  cupertino_icons: ^1.0.6
+
+# --- قسم اعتماديات التطوير فقط ---
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^3.0.0
+  flutterfire_cli: ^0.2.7 # تمت إضافته هنا
+
+flutter:
+  uses-material-design: true
