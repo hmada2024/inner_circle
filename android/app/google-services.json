@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "727659847869",
+    "project_id": "inner-circle-chat-2b785",
+    "storage_bucket": "inner-circle-chat-2b785.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:727659847869:android:cb198bcde1dcfa8ce617d4",
+        "android_client_info": {
+          "package_name": "com.innercircle"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDMYCJwF86VfrSXKTNAtXIPEP3vET2pqAA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

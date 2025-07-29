@@ -1,6 +1,8 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:inner_circle/core/providers/firebase_providers.dart';
+import 'package:inner_circle/firebase_options.dart';
 
 void main() async {
   // تأكد من تهيئة Flutter قبل تشغيل أي شيء آخر
