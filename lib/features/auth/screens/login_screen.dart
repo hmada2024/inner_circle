@@ -2,108 +2,117 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:inner_circle/features/auth/controller/auth_controller.dart';
 
-class LoginScreen extends ConsumerStatefulWidget {
+class LoginScreen extends ConsumerWidget {
   const LoginScreen({super.key});
 
   @override
-  ConsumerState<LoginScreen> createState() => _LoginScreenState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final emailController = TextEditingController();
+    final passwordController = TextEditingController();
 
-class _LoginScreenState extends ConsumerState<LoginScreen> {
-  final phoneController = TextEditingController();
+    // تم تحسين الدوال لإظهار رسالة للمستخدم
+    void signUp() {
+      final email = emailController.text.trim();
+      final password = passwordController.text.trim();
 
-  @override
-  void dispose() {
-    phoneController.dispose();
-    super.dispose();
-  }
-
-  String normalizePhoneNumber(String phone) {
-    String normalized = phone.trim();
-
-    // 2. إذا كان الرقم يبدأ بـ "00"، استبدلها بـ "+"
-    if (normalized.startsWith('00')) {
-      normalized = '+${normalized.substring(2)}';
+      if (email.isNotEmpty && password.isNotEmpty) {
+        ref.read(authControllerProvider.notifier).signUpWithEmail(
+              email: email,
+              password: password,
+              context: context,
+            );
+      } else {
+        // إذا كانت الحقول فارغة، أظهر هذه الرسالة
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text('الرجاء ملء البريد الإلكتروني وكلمة المرور')),
+        );
+      }
     }
-    // 3. إذا كان الرقم يبدأ بـ "01" (رقم مصري محلي)، أضف كود الدولة
-    // (هذا افتراض بناءً على الأرقام المستخدمة، ويمكن تعديله)
-    else if (normalized.startsWith('01')) {
-      normalized = '+20${normalized.substring(1)}';
+
+    void signIn() {
+      final email = emailController.text.trim();
+      final password = passwordController.text.trim();
+
+      if (email.isNotEmpty && password.isNotEmpty) {
+        ref.read(authControllerProvider.notifier).signInWithEmail(
+              email: email,
+              password: password,
+              context: context,
+            );
+      } else {
+        // إذا كانت الحقول فارغة، أظهر هذه الرسالة
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text('الرجاء ملء البريد الإلكتروني وكلمة المرور')),
+        );
+      }
     }
 
-    // إذا كان الرقم يبدأ بـ "+" بالفعل، فهو بالفعل بالصيغة الصحيحة
-    return normalized;
-  }
-  // --- نهاية الدالة الجديدة ---
-
-  void sendPhoneNumber() {
-    String rawPhoneNumber = phoneController.text;
-
-    if (rawPhoneNumber.isNotEmpty) {
-      // --- التعديل هنا ---
-      // نقوم بتوحيد صيغة الرقم قبل إرساله
-      String finalPhoneNumber = normalizePhoneNumber(rawPhoneNumber);
-      // --- نهاية التعديل ---
-
-      // الآن نرسل الرقم بالصيغة الموحدة دائماً
-      ref
-          .read(authControllerProvider)
-          .signInWithPhone(context, finalPhoneNumber);
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('الرجاء إدخال رقم الهاتف')),
-      );
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
+    final isLoading = ref.watch(authControllerProvider);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('تسجيل الدخول'),
-        elevation: 0,
-        backgroundColor: Colors.transparent,
+        title: const Text('الدائرة المقربة'),
       ),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const Text(
-                'مرحباً بك في الدائرة المقربة',
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                minHeight: MediaQuery.of(context).size.height - 120,
               ),
-              const SizedBox(height: 10),
-              const Text(
-                'الرجاء إدخال رقم هاتفك للتحقق من أنك ضمن القائمة المصرح بها',
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.grey),
-              ),
-              const SizedBox(height: 30),
-              TextField(
-                controller: phoneController,
-                textAlign: TextAlign.center,
-                decoration: const InputDecoration(
-                  hintText: '01001234567', // تغيير النص الإرشادي للصيغة المحلية
-                  hintStyle: TextStyle(color: Colors.grey),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(10)),
-                  ),
+              child: IntrinsicHeight(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Spacer(),
+                    const Text('مرحباً بك',
+                        style: TextStyle(
+                            fontSize: 24, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 20),
+                    TextField(
+                      controller: emailController,
+                      decoration: const InputDecoration(
+                          labelText: 'البريد الإلكتروني',
+                          border: OutlineInputBorder()),
+                      keyboardType: TextInputType.emailAddress,
+                    ),
+                    const SizedBox(height: 15),
+                    TextField(
+                      controller: passwordController,
+                      decoration: const InputDecoration(
+                          labelText: 'كلمة المرور',
+                          border: OutlineInputBorder()),
+                      obscureText: true,
+                    ),
+                    const SizedBox(height: 30),
+                    if (isLoading)
+                      const CircularProgressIndicator()
+                    else
+                      Column(
+                        children: [
+                          ElevatedButton(
+                            onPressed: signIn,
+                            style: ElevatedButton.styleFrom(
+                                minimumSize: const Size(double.infinity, 50)),
+                            child: const Text('تسجيل الدخول'),
+                          ),
+                          const SizedBox(height: 10),
+                          OutlinedButton(
+                            onPressed: signUp,
+                            style: OutlinedButton.styleFrom(
+                                minimumSize: const Size(double.infinity, 50)),
+                            child: const Text('إنشاء حساب جديد'),
+                          ),
+                        ],
+                      ),
+                    const Spacer(),
+                  ],
                 ),
-                keyboardType: TextInputType.phone,
               ),
-              const Spacer(),
-              SizedBox(
-                width: size.width * 0.9,
-                child: ElevatedButton(
-                  onPressed: sendPhoneNumber,
-                  child: const Text('إرسال رمز التحقق'),
-                ),
-              ),
-            ],
+            ),
           ),
         ),
       ),
