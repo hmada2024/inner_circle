@@ -23,8 +23,8 @@ if (flutterVersionName == null) {
 }
 
 android {
-    namespace = "com.innercircle.chat"
-    compileSdk = 34 // تحديث إلزامي
+    namespace = "com.innercircle"
+    compileSdk = 34
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
