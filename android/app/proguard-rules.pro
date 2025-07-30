@@ -1,18 +1,26 @@
 # قواعد Flutter الافتراضية
 -dontwarn io.flutter.embedding.**
+-keep class io.flutter.app.** { *; }
+-keep class io.flutter.plugin.**  { *; }
+-keep class io.flutter.util.**  { *; }
+-keep class io.flutter.view.**  { *; }
+-keep class io.flutter.plugins.**  { *; }
+
+# القاعدة الأهم: الحفاظ على MainActivity الخاصة بالتطبيق
+-keep class com.innercircle.MainActivity { *; }
+
+# (الأسطر الجديدة هنا) -> قواعد لمنع حذف فئات Google Play
+-dontwarn com.google.android.play.core.splitcompat.**
+-keep class com.google.android.play.core.splitcompat.** { *; }
 
 # قواعد خاصة بـ Firebase للحفاظ على الكود المطلوب
-# Firebase Core
+# Firebase Core & Auth
 -keep class com.google.firebase.** { *; }
--keep class org.apache.** { *; }
--dontwarn org.apache.**
--dontwarn com.google.common.**
+-keepattributes Signature
+-keepattributes *Annotation*
+-keepnames class com.google.android.gms.** {*;}
+-dontwarn com.google.android.gms.**
 -dontwarn com.google.firebase.auth.**
-
-# Firebase Auth
--keep class com.google.firebase.auth.** { *; }
--keep class com.google.android.gms.internal.firebase-auth.** { *; }
--keep class com.google.android.gms.safetynet.** { *; }
 
 # Cloud Firestore
 -keep class com.google.firebase.firestore.** { *; }
@@ -24,3 +32,7 @@
 
 # مطلوب من قبل مغلفات JNI الخاصة بـ Flutter
 -keepnames class io.flutter.embedding.engine.FlutterJNI
+
+# قواعد إضافية لـ Kotlin (مهم جداً)
+-dontwarn kotlin.**
+-keep class kotlin.Metadata { *; }
