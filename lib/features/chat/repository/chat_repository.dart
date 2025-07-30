@@ -1,4 +1,4 @@
-// lib/features/chat/repository/chat_repository.dart
+// lib/features/chat/repository/chat_repository.dart 
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -17,7 +17,6 @@ class ChatRepository {
   })  : _firestore = firestore,
         _auth = auth;
 
-  // دالة ذكية لإنشاء معرّف ثابت لغرفة الدردشة بين مستخدمين
   String getChatRoomId(String peerUserId) {
     final currentUserId = _auth.currentUser!.uid;
     if (currentUserId.hashCode <= peerUserId.hashCode) {
@@ -27,7 +26,6 @@ class ChatRepository {
     }
   }
 
-  // الدالة الرئيسية لإرسال الرسالة
   void sendMessage({
     required BuildContext context,
     required String text,
@@ -36,7 +34,7 @@ class ChatRepository {
     try {
       final timeSent = Timestamp.now();
       final senderId = _auth.currentUser!.uid;
-      final messageId = const Uuid().v1(); // إنشاء ID فريد للرسالة
+      final messageId = const Uuid().v1();
 
       final message = MessageModel(
         senderId: senderId,
@@ -46,10 +44,8 @@ class ChatRepository {
         messageId: messageId,
       );
 
-      // 1. تحديد غرفة الدردشة الصحيحة
       final chatRoomId = getChatRoomId(receiverId);
 
-      // 2. إرسال الرسالة إلى المجموعة الفرعية 'messages' داخل غرفة الدردشة
       await _firestore
           .collection('chats')
           .doc(chatRoomId)
@@ -63,5 +59,21 @@ class ChatRepository {
         );
       }
     }
+  }
+
+  Stream<List<MessageModel>> getMessagesStream(String peerUserId) {
+    final chatRoomId = getChatRoomId(peerUserId);
+
+    return _firestore
+        .collection('chats')
+        .doc(chatRoomId)
+        .collection('messages')
+        .orderBy('timestamp', descending: false)
+        .snapshots()
+        .map((snapshot) {
+      return snapshot.docs
+          .map((doc) => MessageModel.fromMap(doc.data()))
+          .toList();
+    });
   }
 }
