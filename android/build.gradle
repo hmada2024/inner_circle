@@ -1,10 +1,11 @@
 buildscript {
-    ext.kotlin_version = '1.9.23' // نسخة حديثة متوافقة
+    ext.kotlin_version = '1.9.23'
     repositories {
         google()
         mavenCentral()
     }
     dependencies {
+        classpath 'com.google.gms:google-services:4.4.2'
     }
 }
 
