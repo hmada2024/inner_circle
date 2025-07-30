@@ -3,10 +3,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:inner_circle/features/home/controller/home_controller.dart';
+// الخطوة 2.1: استيراد شاشة المحادثة الجديدة ونموذج المستخدم
+import 'package:inner_circle/features/chat/screens/chat_screen.dart';
+import 'package:inner_circle/core/models/user_model.dart';
 
-// تحويلها إلى ConsumerWidget لتتمكن من "مشاهدة" الـ Providers
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
+
+  // الخطوة 2.2: إنشاء دالة للانتقال لجعل الكود أنظف
+  void navigateToChatScreen(BuildContext context, UserModel user) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ChatScreen(peerUser: user),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -14,23 +26,18 @@ class HomeScreen extends ConsumerWidget {
       appBar: AppBar(
         title: const Text('الدائرة المقربة'),
       ),
-      // نستخدم ref.watch لمراقبة usersProvider والحصول على قائمة المستخدمين
       body: ref.watch(usersProvider).when(
-            // في حالة النجاح وجلب البيانات
             data: (users) {
-              // إذا كانت القائمة فارغة (لا يوجد مستخدمون آخرون بعد)
               if (users.isEmpty) {
                 return const Center(
                   child: Text('لا يوجد مستخدمون آخرون في الدائرة بعد.'),
                 );
               }
-              // إذا كانت هناك بيانات، نعرضها في قائمة
               return ListView.builder(
                 itemCount: users.length,
                 itemBuilder: (context, index) {
                   final user = users[index];
                   return ListTile(
-                    // صورة المستخدم (أو الحرف الأول من اسمه كبداية)
                     leading: CircleAvatar(
                       child: Text(user.name.isNotEmpty
                           ? user.name[0].toUpperCase()
@@ -38,19 +45,19 @@ class HomeScreen extends ConsumerWidget {
                     ),
                     title: Text(user.name),
                     subtitle: Text(user.email),
+                    // الخطوة 2.3: استبدال الـ print بالانتقال الفعلي
                     onTap: () {
-                      // TODO: عند الضغط، يتم الانتقال إلى شاشة المحادثة مع هذا المستخدم
-                      print('Starting chat with ${user.name}');
+                      // هذا هو الأسلوب الاحترافي للانتقال بين الشاشات
+                      // مع تمرير البيانات المطلوبة (بيانات المستخدم الآخر)
+                      navigateToChatScreen(context, user);
                     },
                   );
                 },
               );
             },
-            // في حالة وجود خطأ
             error: (err, stack) => Center(
               child: Text('حدث خطأ: ${err.toString()}'),
             ),
-            // أثناء تحميل البيانات
             loading: () => const Center(
               child: CircularProgressIndicator(),
             ),
