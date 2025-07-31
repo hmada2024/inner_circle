@@ -30,7 +30,7 @@ class MyApp extends ConsumerWidget {
     // --- الشريان الرئيسي للتطبيق ---
     // هذا هو المنطق الذي يقرر أي شاشة يجب عرضها
     return MaterialApp(
-      title: 'الدائرة المقربة',
+      title: 'Inner Circle',
       theme: ThemeData(
         primarySwatch: Colors.teal,
         visualDensity: VisualDensity.adaptivePlatformDensity,

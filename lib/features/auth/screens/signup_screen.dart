@@ -62,7 +62,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                   Icon(Icons.person_add_alt_1_outlined,
                       size: 80, color: theme.primaryColor),
                   const SizedBox(height: 20),
-                  Text('انضم إلى الدائرة',
+                  Text('join to Inner Circle',
                       style: theme.textTheme.headlineMedium
                           ?.copyWith(fontWeight: FontWeight.bold)),
                   const SizedBox(height: 8),

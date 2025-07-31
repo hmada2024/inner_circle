@@ -24,7 +24,7 @@ class HomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('الدائرة المقربة'),
+        title: const Text('Inner Circle'),
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
@@ -39,7 +39,7 @@ class HomeScreen extends ConsumerWidget {
             data: (users) {
               if (users.isEmpty) {
                 return const Center(
-                  child: Text('لا يوجد مستخدمون آخرون في الدائرة بعد.'),
+                  child: Text('لا يوجد مستخدمون آخرون'),
                 );
               }
               return ListView.builder(
