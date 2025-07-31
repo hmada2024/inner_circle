@@ -22,6 +22,7 @@ class HomeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final currentUserId = FirebaseAuth.instance.currentUser?.uid;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Inner Circle'),
@@ -39,7 +40,7 @@ class HomeScreen extends ConsumerWidget {
             data: (users) {
               if (users.isEmpty) {
                 return const Center(
-                  child: Text('لا يوجد مستخدمون آخرون'),
+                  child: Text('سيظهر أصدقاؤك هنا عند انضمامهم'),
                 );
               }
               return ListView.builder(
@@ -55,6 +56,11 @@ class HomeScreen extends ConsumerWidget {
 
                       return lastMessageAsyncValue.when(
                         data: (lastMessage) {
+                          // --- جديد: التحقق من وجود رسائل غير مقروءة ---
+                          final isUnread = lastMessage != null &&
+                              !lastMessage.isRead &&
+                              lastMessage.senderId != currentUserId;
+
                           return ListTile(
                             contentPadding: const EdgeInsets.symmetric(
                                 horizontal: 16.0, vertical: 8.0),
@@ -73,16 +79,30 @@ class HomeScreen extends ConsumerWidget {
                                     fontWeight: FontWeight.bold)),
                             subtitle: Text(
                               lastMessage != null
-                                  ? (lastMessage.senderId ==
-                                          FirebaseAuth.instance.currentUser?.uid
+                                  ? (lastMessage.senderId == currentUserId
                                       ? 'أنت: ${lastMessage.text}'
                                       : lastMessage.text)
                                   : 'ابدأ المحادثة...',
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
+                              // --- جديد: تغيير شكل النص غير المقروء ---
                               style: TextStyle(
-                                  color: Colors.grey.shade600, fontSize: 14),
+                                  color: isUnread
+                                      ? Theme.of(context).colorScheme.primary
+                                      : Colors.grey.shade600,
+                                  fontWeight: isUnread
+                                      ? FontWeight.bold
+                                      : FontWeight.normal,
+                                  fontSize: 14),
                             ),
+                            // --- جديد: إظهار مؤشر للرسائل غير المقروءة ---
+                            trailing: isUnread
+                                ? CircleAvatar(
+                                    radius: 8,
+                                    backgroundColor:
+                                        Theme.of(context).colorScheme.primary,
+                                  )
+                                : null,
                             onTap: () {
                               navigateToChatScreen(context, user);
                             },
