@@ -1,4 +1,4 @@
-// lib/features/chat/repository/chat_repository.dart 
+// lib/features/chat/repository/chat_repository.dart
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -61,6 +61,7 @@ class ChatRepository {
     }
   }
 
+  // --- تم تعديل هذه الدالة بالكامل ---
   Stream<List<MessageModel>> getMessagesStream(String peerUserId) {
     final chatRoomId = getChatRoomId(peerUserId);
 
@@ -68,12 +69,32 @@ class ChatRepository {
         .collection('chats')
         .doc(chatRoomId)
         .collection('messages')
-        .orderBy('timestamp', descending: false)
+        .orderBy('timestamp', descending: true) // جلب الأحدث أولاً
+        .limit(50) // تحديد العدد بـ 50 رسالة فقط
         .snapshots()
         .map((snapshot) {
-      return snapshot.docs
-          .map((doc) => MessageModel.fromMap(doc.data()))
-          .toList();
+      final messages =
+          snapshot.docs.map((doc) => MessageModel.fromMap(doc.data())).toList();
+      // عكس القائمة لعرض الأقدم في الأعلى والأحدث في الأسفل
+      return messages.reversed.toList();
+    });
+  }
+
+  // --- تم إضافة هذه الدالة الجديدة ---
+  Stream<MessageModel?> getLastMessageStream(String peerUserId) {
+    final chatRoomId = getChatRoomId(peerUserId);
+    return _firestore
+        .collection('chats')
+        .doc(chatRoomId)
+        .collection('messages')
+        .orderBy('timestamp', descending: true)
+        .limit(1)
+        .snapshots()
+        .map((snapshot) {
+      if (snapshot.docs.isNotEmpty) {
+        return MessageModel.fromMap(snapshot.docs.first.data());
+      }
+      return null;
     });
   }
 }

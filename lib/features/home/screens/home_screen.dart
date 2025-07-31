@@ -1,16 +1,16 @@
 // lib/features/home/screens/home_screen.dart
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:inner_circle/features/home/controller/home_controller.dart';
-// الخطوة 2.1: استيراد شاشة المحادثة الجديدة ونموذج المستخدم
-import 'package:inner_circle/features/chat/screens/chat_screen.dart';
 import 'package:inner_circle/core/models/user_model.dart';
+import 'package:inner_circle/features/chat/controller/chat_controller.dart';
+import 'package:inner_circle/features/chat/screens/chat_screen.dart';
+import 'package:inner_circle/features/home/controller/home_controller.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
-  // الخطوة 2.2: إنشاء دالة للانتقال لجعل الكود أنظف
   void navigateToChatScreen(BuildContext context, UserModel user) {
     Navigator.push(
       context,
@@ -25,6 +25,15 @@ class HomeScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('الدائرة المقربة'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: () {
+              FirebaseAuth.instance.signOut();
+            },
+            tooltip: 'تسجيل الخروج',
+          ),
+        ],
       ),
       body: ref.watch(usersProvider).when(
             data: (users) {
@@ -37,19 +46,67 @@ class HomeScreen extends ConsumerWidget {
                 itemCount: users.length,
                 itemBuilder: (context, index) {
                   final user = users[index];
-                  return ListTile(
-                    leading: CircleAvatar(
-                      child: Text(user.name.isNotEmpty
-                          ? user.name[0].toUpperCase()
-                          : '?'),
-                    ),
-                    title: Text(user.name),
-                    subtitle: Text(user.email),
-                    // الخطوة 2.3: استبدال الـ print بالانتقال الفعلي
-                    onTap: () {
-                      // هذا هو الأسلوب الاحترافي للانتقال بين الشاشات
-                      // مع تمرير البيانات المطلوبة (بيانات المستخدم الآخر)
-                      navigateToChatScreen(context, user);
+                  // تغليف ListTile بـ Consumer للوصول لـ ref
+                  return Consumer(
+                    builder: (context, ref, child) {
+                      // مراقبة الـ provider الخاص بآخر رسالة لهذا المستخدم
+                      final lastMessageAsyncValue =
+                          ref.watch(lastMessageProvider(user.uid));
+
+                      return lastMessageAsyncValue.when(
+                        data: (lastMessage) {
+                          return ListTile(
+                            contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 16.0, vertical: 8.0),
+                            leading: CircleAvatar(
+                              radius: 28,
+                              child: Text(
+                                user.name.isNotEmpty
+                                    ? user.name[0].toUpperCase()
+                                    : '?',
+                                style: const TextStyle(
+                                    fontSize: 22, fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            title: Text(user.name,
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold)),
+                            subtitle: Text(
+                              lastMessage != null
+                                  ? (lastMessage.senderId ==
+                                          FirebaseAuth.instance.currentUser?.uid
+                                      ? 'أنت: ${lastMessage.text}'
+                                      : lastMessage.text)
+                                  : 'ابدأ المحادثة...',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                  color: Colors.grey.shade600, fontSize: 14),
+                            ),
+                            onTap: () {
+                              navigateToChatScreen(context, user);
+                            },
+                          );
+                        },
+                        loading: () => ListTile(
+                          contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 16.0, vertical: 8.0),
+                          leading: CircleAvatar(
+                            radius: 28,
+                            child: Text(
+                              user.name.isNotEmpty
+                                  ? user.name[0].toUpperCase()
+                                  : '?',
+                            ),
+                          ),
+                          title: Text(user.name),
+                          subtitle: const Text('جارِ التحميل...'),
+                        ),
+                        error: (err, stack) => ListTile(
+                          title: Text(user.name),
+                          subtitle: const Text('خطأ في تحميل الرسالة'),
+                        ),
+                      );
                     },
                   );
                 },

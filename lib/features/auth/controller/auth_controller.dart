@@ -3,9 +3,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:inner_circle/features/auth/repository/auth_repository.dart';
-import 'package:inner_circle/core/providers/firebase_providers.dart'; // تأكد من وجود هذا السطر
+import 'package:inner_circle/core/providers/firebase_providers.dart';
 
-// Provider لتوفير AuthRepository (لم يتغير)
 final authRepositoryProvider = Provider(
   (ref) => AuthRepository(
     auth: ref.read(firebaseAuthProvider),
@@ -19,17 +18,14 @@ final authControllerProvider = StateNotifierProvider<AuthController, bool>(
   ),
 );
 
-// تم تعديل الكلاس ليكون StateNotifier
 class AuthController extends StateNotifier<bool> {
   final AuthRepository _authRepository;
 
-  // في البداية، حالة التحميل تكون false
   AuthController({required AuthRepository authRepository})
       : _authRepository = authRepository,
         super(false);
 
-  // --- دالة جديدة ---
-  void signUpWithEmail({
+  Future<void> signUpWithEmail({
     required String email,
     required String password,
     required BuildContext context,
@@ -40,8 +36,7 @@ class AuthController extends StateNotifier<bool> {
     state = false; // إيقاف حالة التحميل
   }
 
-  // --- دالة جديدة ---
-  void signInWithEmail({
+  Future<void> signInWithEmail({
     required String email,
     required String password,
     required BuildContext context,

@@ -1,18 +1,17 @@
-// lib/features/auth/screens/login_screen.dart
+// lib/features/auth/screens/signup_screen.dart
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:inner_circle/features/auth/controller/auth_controller.dart';
-import 'package:inner_circle/features/auth/screens/signup_screen.dart';
 
-class LoginScreen extends ConsumerStatefulWidget {
-  const LoginScreen({super.key});
+class SignUpScreen extends ConsumerStatefulWidget {
+  const SignUpScreen({super.key});
 
   @override
-  ConsumerState<LoginScreen> createState() => _LoginScreenState();
+  ConsumerState<SignUpScreen> createState() => _SignUpScreenState();
 }
 
-class _LoginScreenState extends ConsumerState<LoginScreen> {
+class _SignUpScreenState extends ConsumerState<SignUpScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _isPasswordVisible = false;
@@ -24,30 +23,23 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     super.dispose();
   }
 
-  void signIn() {
+  void signUp() {
     String email = _emailController.text.trim();
     final password = _passwordController.text.trim();
 
     if (email.isNotEmpty && password.isNotEmpty) {
       // --- الإصلاح الذكي ---
-      // التحقق مما إذا كان المستخدم قد كتب النطاق بالفعل
       if (!email.contains('@')) {
         email = '$email@gmail.com';
       }
       // --------------------
 
-      ref.read(authControllerProvider.notifier).signInWithEmail(
+      ref.read(authControllerProvider.notifier).signUpWithEmail(
             email: email,
             password: password,
             context: context,
           );
     }
-  }
-
-  void navigateToSignUp() {
-    Navigator.of(context).push(
-      MaterialPageRoute(builder: (context) => const SignUpScreen()),
-    );
   }
 
   @override
@@ -56,6 +48,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final theme = Theme.of(context);
 
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('إنشاء حساب جديد'),
+      ),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -64,18 +59,17 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.shield_moon_outlined,
+                  Icon(Icons.person_add_alt_1_outlined,
                       size: 80, color: theme.primaryColor),
                   const SizedBox(height: 20),
-                  Text('مرحباً بعودتك',
+                  Text('انضم إلى الدائرة',
                       style: theme.textTheme.headlineMedium
                           ?.copyWith(fontWeight: FontWeight.bold)),
                   const SizedBox(height: 8),
-                  Text('سجّل دخولك لمتابعة المحادثات',
+                  Text('خطوات بسيطة تفصلك عن أصدقائك',
                       style: theme.textTheme.titleMedium
                           ?.copyWith(color: Colors.grey.shade600)),
                   const SizedBox(height: 40),
-                  // تم تعديل حقل الإيميل لإزالة اللاحقة المرئية لجعل الإصلاح منطقياً
                   TextField(
                     controller: _emailController,
                     decoration: const InputDecoration(
@@ -90,7 +84,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   TextField(
                     controller: _passwordController,
                     decoration: InputDecoration(
-                      labelText: 'كلمة المرور',
+                      labelText: 'كلمة المرور (6 أحرف على الأقل)',
                       prefixIcon: const Icon(Icons.lock_outline),
                       border: const OutlineInputBorder(),
                       suffixIcon: IconButton(
@@ -112,10 +106,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   SizedBox(
                     width: double.infinity,
                     height: 50,
-                    child: ElevatedButton(
-                      onPressed: isLoading ? null : signIn,
-                      child: Text(isLoading ? 'جاري الدخول...' : 'تسجيل الدخول',
-                          style: const TextStyle(fontSize: 18)),
+                    child: ElevatedButton.icon(
+                      icon: isLoading
+                          ? const SizedBox.shrink()
+                          : const Icon(Icons.check_circle_outline),
+                      onPressed: isLoading ? null : signUp,
+                      label:
+                          Text(isLoading ? 'جاري الإنشاء...' : 'إنشاء الحساب'),
+                      style: ElevatedButton.styleFrom(
+                          textStyle: const TextStyle(fontSize: 18)),
                     ),
                   ),
                   if (isLoading)
@@ -123,17 +122,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       padding: EdgeInsets.only(top: 16.0),
                       child: CircularProgressIndicator(),
                     ),
-                  const SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Text('ليس لديك حساب؟'),
-                      TextButton(
-                        onPressed: navigateToSignUp,
-                        child: const Text('إنشاء حساب جديد'),
-                      ),
-                    ],
-                  )
                 ],
               ),
             ),

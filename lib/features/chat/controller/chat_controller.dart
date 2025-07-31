@@ -1,4 +1,4 @@
-// lib/features/chat/controller/chat_controller.dart (النسخة الكاملة والصحيحة)
+// lib/features/chat/controller/chat_controller.dart
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -20,11 +20,18 @@ final chatControllerProvider = Provider((ref) {
   return ChatController(chatRepository: chatRepository);
 });
 
-// تم تعريفه الآن بشكل كامل وصحيح
+// Provider لجلب قائمة الرسائل للمحادثة
 final messagesStreamProvider = StreamProvider.autoDispose
     .family<List<MessageModel>, String>((ref, peerUserId) {
   final chatController = ref.watch(chatControllerProvider);
   return chatController.getMessagesStream(peerUserId);
+});
+
+// --- تم إضافة هذا الـ Provider الجديد ---
+final lastMessageProvider =
+    StreamProvider.autoDispose.family<MessageModel?, String>((ref, peerUserId) {
+  final chatController = ref.watch(chatControllerProvider);
+  return chatController.getLastMessageStream(peerUserId);
 });
 
 class ChatController {
@@ -45,8 +52,12 @@ class ChatController {
     );
   }
 
-  // دالة جلب الرسائل (كاملة)
   Stream<List<MessageModel>> getMessagesStream(String peerUserId) {
     return _chatRepository.getMessagesStream(peerUserId);
+  }
+
+  // --- تم إضافة هذه الدالة الجديدة ---
+  Stream<MessageModel?> getLastMessageStream(String peerUserId) {
+    return _chatRepository.getLastMessageStream(peerUserId);
   }
 }
